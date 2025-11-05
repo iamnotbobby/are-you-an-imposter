@@ -2,7 +2,7 @@ import { SiteConfig } from "@/types";
 
 export const siteConfig: SiteConfig = {
 	name: "areyouanimposter.com",
-	title: "Are you an imposter? - anonymous confessions about imposter syndrome",
+	title: "are you an imposter?",
 	description:
 		"a safe space to share anonymous confessions about imposter syndrome. you're not alone in feeling this way.",
 	origin: "https://areyouanimposter.com",
