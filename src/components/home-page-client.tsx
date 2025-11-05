@@ -279,7 +279,7 @@ export function HomePageClient({ isModerator }: HomePageClientProps) {
 						/>
 					</svg>
 					<div className="max-w-7xl mx-auto px-4 py-6">
-						<div className="flex items-center justify-center gap-3 text-xs text-black/60 font-mono flex-wrap">
+						<div className="flex items-center justify-center gap-2 sm:gap-3 text-xs text-black/60 font-mono flex-wrap">
 							<a
 								href="https://github.com/iamnotbobby/are-you-an-imposter"
 								target="_blank"
@@ -288,10 +288,13 @@ export function HomePageClient({ isModerator }: HomePageClientProps) {
 							>
 								source code
 							</a>
-							<span>•</span>
-							<span>a project exploring lack of fit and belonging</span>
-							<span>•</span>
+							<span className="hidden sm:inline">•</span>
+							<span className="text-center">a project exploring lack of fit and belonging</span>
+							<span className="hidden sm:inline">•</span>
 							<ViewCounter />
+						</div>
+						<div className="text-center mt-2 text-xs text-black/40 font-mono">
+							created for university of nevada las vegas (COLA)
 						</div>
 					</div>
 				</footer>
