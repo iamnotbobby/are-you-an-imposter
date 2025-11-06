@@ -13,12 +13,11 @@ import {
 	LogOut,
 } from "lucide-react";
 import {
-	getSettings,
-	updateSettings,
 	getPendingConfessions,
 	processPendingConfession,
 	batchDeleteConfessions,
 } from "@/lib/moderation";
+import { getSettings, updateSettings } from "@/actions/settings";
 import { signOut } from "@/lib/auth-client";
 
 interface Confession {
@@ -89,10 +88,17 @@ export function ModerationPanel({
 				const newRequireApproval =
 					key === "requireApproval" ? value : requireApproval;
 
-				await updateSettings(newSubmissionsPaused, newRequireApproval);
+				const result = await updateSettings({
+					submissionsPaused: newSubmissionsPaused,
+					requireApproval: newRequireApproval,
+				});
 
-				if (key === "submissionsPaused") setSubmissionsPaused(value);
-				if (key === "requireApproval") setRequireApproval(value);
+				if (result.success) {
+					if (key === "submissionsPaused") setSubmissionsPaused(value);
+					if (key === "requireApproval") setRequireApproval(value);
+				} else {
+					console.error("Error updating settings:", result.error);
+				}
 			} catch (error) {
 				console.error("Error updating settings:", error);
 			}

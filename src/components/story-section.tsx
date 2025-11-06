@@ -2,19 +2,32 @@
 
 import { motion } from "motion/react";
 import { FAQSection } from "./faq-section";
+import { useEffect, useState } from "react";
+import { getConfessionStats } from "@/actions/stats";
 
 interface StorySectionProps {
 	searchQuery: string;
 	onSearchChange: (value: string) => void;
 	resultsCount: number;
+	onStatsRefresh?: number;
 }
 
 export function StorySection({
 	searchQuery,
 	onSearchChange,
 	resultsCount,
+	onStatsRefresh,
 }: StorySectionProps) {
 	const startDelay = 2.5;
+	const [stats, setStats] = useState<{ total: number; deleted: number } | null>(
+		null,
+	);
+
+	useEffect(() => {
+		getConfessionStats()
+			.then((data) => setStats(data))
+			.catch(() => {});
+	}, [onStatsRefresh]);
 
 	return (
 		<motion.section className="max-w-4xl mx-auto px-4 pt-4 pb-8 text-center">
@@ -111,34 +124,12 @@ export function StorySection({
 			</div>
 
 			<motion.div
-				initial={{ opacity: 0 }}
-				animate={{ opacity: 1 }}
-				transition={{ delay: startDelay + 0.6, duration: 0.6 }}
-				className="my-10 flex items-center justify-center"
-			>
-				<div className="h-px bg-gray-300 w-24"></div>
-				<div className="mx-4 text-gray-400">•</div>
-				<div className="h-px bg-gray-300 w-24"></div>
-			</motion.div>
-
-			<motion.div
 				initial={{ opacity: 0, y: 20 }}
 				animate={{ opacity: 1, y: 0 }}
 				transition={{ delay: startDelay + 0.8, duration: 0.8 }}
-				className="mb-10"
+				className="my-10"
 			>
 				<FAQSection />
-			</motion.div>
-
-			<motion.div
-				initial={{ opacity: 0 }}
-				animate={{ opacity: 1 }}
-				transition={{ delay: startDelay + 1, duration: 0.6 }}
-				className="my-10 flex items-center justify-center"
-			>
-				<div className="h-px bg-gray-300 w-24"></div>
-				<div className="mx-4 text-gray-400">•</div>
-				<div className="h-px bg-gray-300 w-24"></div>
 			</motion.div>
 
 			<motion.div
@@ -169,6 +160,38 @@ export function StorySection({
 						/>
 					</svg>
 				</div>
+				{stats && (
+					<motion.div
+						initial={{ opacity: 0 }}
+						animate={{ opacity: 1 }}
+						transition={{ delay: searchQuery ? 0 : startDelay + 1.5 }}
+						className="mt-4 flex items-center justify-center gap-4 sm:gap-6 text-sm font-mono flex-wrap"
+					>
+						<div className="flex items-center gap-2">
+							<span className="text-black">confessions:</span>
+							<span className="font-bold text-black">{stats.total}</span>
+						</div>
+						<svg
+							width="24"
+							height="6"
+							viewBox="0 0 24 6"
+							className="text-black"
+							style={{ minWidth: "24px" }}
+						>
+							<path
+								d="M1 3 C 2 2.5, 3 3.5, 4 2.8 C 5 2.3, 6 3.8, 7 3 C 8 2.4, 9 3.6, 10 2.9 C 11 2.5, 12 3.7, 13 3.2 C 14 2.6, 15 3.4, 16 3 C 17 2.7, 18 3.5, 19 2.8 C 20 2.4, 21 3.3, 22 3.1 C 22.5 2.9, 23 3.2, 23 3"
+								stroke="currentColor"
+								strokeWidth="1.5"
+								fill="none"
+								strokeLinecap="round"
+							/>
+						</svg>
+						<div className="flex items-center gap-2">
+							<span className="text-black">deleted:</span>
+							<span className="font-bold text-black">{stats.deleted}</span>
+						</div>
+					</motion.div>
+				)}
 				{searchQuery && (
 					<motion.p
 						initial={{ opacity: 0 }}
@@ -177,11 +200,6 @@ export function StorySection({
 					>
 						found {resultsCount} confession{resultsCount !== 1 ? "s" : ""}
 					</motion.p>
-				)}
-				{!searchQuery && (
-					<p className="mt-2 text-xs text-gray-500 text-center">
-						tip: search by text or ID (e.g., #5)
-					</p>
 				)}
 			</motion.div>
 		</motion.section>

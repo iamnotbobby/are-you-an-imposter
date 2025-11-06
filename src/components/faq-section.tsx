@@ -24,7 +24,7 @@ function FAQItem({ question, answer, index }: FAQItemProps) {
 				onClick={() => setIsOpen(!isOpen)}
 				className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
 			>
-				<span className="text-left text-base md:text-lg font-bold text-black">
+				<span className="text-base md:text-lg font-bold text-black text-left">
 					{question}
 				</span>
 				<motion.svg

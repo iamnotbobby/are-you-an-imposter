@@ -37,7 +37,7 @@ export function SiteHeader() {
 					<motion.h1
 						className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold text-black tracking-tight overflow-hidden whitespace-nowrap"
 						initial={{
-							scale: isMobile ? 1 : 1.2,
+							scale: 1,
 							y: isMobile ? 0 : 50,
 						}}
 						animate={{

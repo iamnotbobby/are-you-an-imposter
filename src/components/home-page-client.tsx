@@ -10,6 +10,7 @@ import { CreateConfessionModal } from "@/components/create-confession-modal";
 import { ModerationPanel } from "@/components/moderation-panel";
 import { ViewCounter } from "@/components/view-counter";
 import { Plus, Settings } from "lucide-react";
+import { getSettings } from "@/actions/settings";
 
 interface Confession {
 	id: number;
@@ -36,6 +37,7 @@ export function HomePageClient({ isModerator }: HomePageClientProps) {
 	const [isLoading, setIsLoading] = useState(false);
 	const [isInitialLoad, setIsInitialLoad] = useState(true);
 	const [submissionsPaused, setSubmissionsPaused] = useState(false);
+	const [statsRefresh, setStatsRefresh] = useState(0);
 	const loadingRef = useRef(false);
 
 	const fetchConfessions = useCallback(
@@ -76,8 +78,7 @@ export function HomePageClient({ isModerator }: HomePageClientProps) {
 	useEffect(() => {
 		fetchConfessions();
 
-		fetch("/api/settings")
-			.then((res) => res.json())
+		getSettings()
 			.then((data) => setSubmissionsPaused(data.submissionsPaused || false))
 			.catch(() => {});
 
@@ -130,12 +131,23 @@ export function HomePageClient({ isModerator }: HomePageClientProps) {
 		if (!searchQuery.trim()) return messages;
 
 		const query = searchQuery.toLowerCase();
+
+		if (query.startsWith("#") || !isNaN(Number(query))) {
+			const id = query.startsWith("#")
+				? parseInt(query.slice(1))
+				: parseInt(query);
+			if (!isNaN(id)) {
+				return messages.filter((msg) => msg.id === id);
+			}
+		}
+
 		return messages.filter((msg) => msg.text.toLowerCase().includes(query));
 	}, [messages, searchQuery]);
 
 	const handleNewConfession = () => {
 		fetchConfessions();
 		setIsCreateModalOpen(false);
+		setStatsRefresh((prev) => prev + 1);
 	};
 
 	const toggleSelect = (id: number) => {
@@ -153,6 +165,7 @@ export function HomePageClient({ isModerator }: HomePageClientProps) {
 					searchQuery={searchQuery}
 					onSearchChange={setSearchQuery}
 					resultsCount={filteredMessages.length}
+					onStatsRefresh={statsRefresh}
 				/>
 
 				{submissionsPaused && (
@@ -184,6 +197,7 @@ export function HomePageClient({ isModerator }: HomePageClientProps) {
 									setMessages((prev) =>
 										prev.filter((c) => c.id !== confession.id),
 									);
+									setStatsRefresh((prev) => prev + 1);
 								}}
 								isSelected={selectedIds.includes(confession.id)}
 								onToggleSelect={
@@ -288,11 +302,37 @@ export function HomePageClient({ isModerator }: HomePageClientProps) {
 							>
 								source code
 							</a>
-							<span className="hidden sm:inline">•</span>
+							<svg
+								width="20"
+								height="4"
+								viewBox="0 0 20 4"
+								className="hidden sm:inline text-black/40"
+							>
+								<path
+									d="M1 2 C 2 1.8, 3 2.3, 4 1.9 C 5 1.6, 6 2.5, 7 2.1 C 8 1.7, 9 2.4, 10 2 C 11 1.8, 12 2.6, 13 2.2 C 14 1.9, 15 2.3, 16 2.1 C 17 1.8, 18 2.4, 19 2"
+									stroke="currentColor"
+									strokeWidth="1.3"
+									fill="none"
+									strokeLinecap="round"
+								/>
+							</svg>
 							<span className="text-center">
 								a project exploring lack of fit and belonging
 							</span>
-							<span className="hidden sm:inline">•</span>
+							<svg
+								width="20"
+								height="4"
+								viewBox="0 0 20 4"
+								className="hidden sm:inline text-black/40"
+							>
+								<path
+									d="M1 2 C 2 1.8, 3 2.3, 4 1.9 C 5 1.6, 6 2.5, 7 2.1 C 8 1.7, 9 2.4, 10 2 C 11 1.8, 12 2.6, 13 2.2 C 14 1.9, 15 2.3, 16 2.1 C 17 1.8, 18 2.4, 19 2"
+									stroke="currentColor"
+									strokeWidth="1.3"
+									fill="none"
+									strokeLinecap="round"
+								/>
+							</svg>
 							<ViewCounter />
 						</div>
 						<div className="text-center mt-2 text-xs text-black/40 font-mono">
@@ -331,6 +371,7 @@ export function HomePageClient({ isModerator }: HomePageClientProps) {
 								prev.filter((c) => c.id !== selectedConfession.id),
 							);
 							setSelectedConfession(null);
+							setStatsRefresh((prev) => prev + 1);
 						}
 					}}
 					onEdit={(id, text) => {
