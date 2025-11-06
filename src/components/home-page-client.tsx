@@ -289,7 +289,9 @@ export function HomePageClient({ isModerator }: HomePageClientProps) {
 								source code
 							</a>
 							<span className="hidden sm:inline">•</span>
-							<span className="text-center">a project exploring lack of fit and belonging</span>
+							<span className="text-center">
+								a project exploring lack of fit and belonging
+							</span>
 							<span className="hidden sm:inline">•</span>
 							<ViewCounter />
 						</div>

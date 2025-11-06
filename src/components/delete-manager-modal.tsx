@@ -44,7 +44,7 @@ export function DeleteManagerModal({
 			const response = await fetch("/api/confessions/delete", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ id, token }),
+				body: JSON.stringify({ token }),
 			});
 
 			if (response.ok) {
@@ -65,14 +65,39 @@ export function DeleteManagerModal({
 	const handleDeleteWithToken = async () => {
 		if (!deleteTokenInput.trim()) return;
 
-		const matches = deleteTokenInput.match(/^(\d+):(.+)$/);
-		if (matches) {
-			const id = parseInt(matches[1]);
-			const token = matches[2];
-			await handleDeleteConfession(id, token);
-			setDeleteTokenInput("");
-		} else {
-			setError("invalid token format. should be id:token");
+		setIsDeleting(true);
+		setError("");
+
+		try {
+			const token = deleteTokenInput.trim();
+			const response = await fetch("/api/confessions/delete", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ token }),
+			});
+
+			if (response.ok) {
+				for (let i = 0; i < localStorage.length; i++) {
+					const key = localStorage.key(i);
+					if (key?.startsWith("confession_")) {
+						const savedToken = localStorage.getItem(key);
+						if (savedToken === token) {
+							localStorage.removeItem(key);
+							break;
+						}
+					}
+				}
+				loadSavedConfessions();
+				setDeleteTokenInput("");
+				onSuccess?.();
+			} else {
+				const data = await response.json();
+				setError(data.error || "invalid token");
+			}
+		} catch (err) {
+			setError("failed to delete confession");
+		} finally {
+			setIsDeleting(false);
 		}
 	};
 
@@ -105,9 +130,7 @@ export function DeleteManagerModal({
 						>
 							<div className="p-6 space-y-6">
 								<div className="flex justify-between items-center">
-									<h2 className="text-2xl font-black">
-										manage deletions
-									</h2>
+									<h2 className="text-2xl font-black">manage deletions</h2>
 									<button
 										onClick={onClose}
 										className="p-2 hover:bg-gray-100 transition-colors"

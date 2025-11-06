@@ -1,22 +1,34 @@
 import { NextResponse } from "next/server";
 import { redis } from "@/lib/redis";
-import { verifyDeleteToken, removeDeleteToken } from "@/lib/cache";
+import { removeDeleteToken } from "@/lib/cache";
 
 export async function POST(request: Request) {
 	try {
 		const body = await request.json();
-		const { id, token } = body;
+		const { token } = body;
 
-		if (!id || !token) {
+		if (!token) {
+			return NextResponse.json({ error: "Missing token" }, { status: 400 });
+		}
+
+		const allTokens = await redis.hgetall("confession:tokens");
+
+		if (!allTokens) {
 			return NextResponse.json(
-				{ error: "Missing required fields" },
-				{ status: 400 },
+				{ error: "Invalid or expired token" },
+				{ status: 403 },
 			);
 		}
 
-		const isValid = await verifyDeleteToken(id, token);
+		let confessionId: number | null = null;
+		for (const [id, storedToken] of Object.entries(allTokens)) {
+			if (storedToken === token) {
+				confessionId = parseInt(id);
+				break;
+			}
+		}
 
-		if (!isValid) {
+		if (confessionId === null) {
 			return NextResponse.json(
 				{ error: "Invalid or expired token" },
 				{ status: 403 },
@@ -30,9 +42,9 @@ export async function POST(request: Request) {
 				typeof item === "string" ? item : JSON.stringify(item);
 			const confession = typeof item === "string" ? JSON.parse(item) : item;
 
-			if (confession.id === id) {
+			if (confession.id === confessionId) {
 				await redis.zrem("confessions", confessionStr);
-				await removeDeleteToken(id);
+				await removeDeleteToken(confessionId);
 
 				return NextResponse.json({ success: true });
 			}
