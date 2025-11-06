@@ -18,7 +18,7 @@ export function StorySection({
 	resultsCount,
 	onStatsRefresh,
 }: StorySectionProps) {
-	const startDelay = 2.5;
+	const startDelay = 2.0;
 	const [stats, setStats] = useState<{ total: number; deleted: number } | null>(
 		null,
 	);
@@ -126,7 +126,7 @@ export function StorySection({
 			<motion.div
 				initial={{ opacity: 0, y: 20 }}
 				animate={{ opacity: 1, y: 0 }}
-				transition={{ delay: startDelay + 0.8, duration: 0.8 }}
+				transition={{ delay: startDelay + 1.8, duration: 0.6 }}
 				className="my-10"
 			>
 				<FAQSection />
@@ -135,7 +135,7 @@ export function StorySection({
 			<motion.div
 				initial={{ opacity: 0, y: 20 }}
 				animate={{ opacity: 1, y: 0 }}
-				transition={{ delay: startDelay + 1.2, duration: 0.8 }}
+				transition={{ delay: startDelay + 2.2, duration: 0.6 }}
 				className="mb-10"
 			>
 				<div className="relative max-w-2xl mx-auto">
@@ -164,18 +164,18 @@ export function StorySection({
 					<motion.div
 						initial={{ opacity: 0 }}
 						animate={{ opacity: 1 }}
-						transition={{ delay: searchQuery ? 0 : startDelay + 1.5 }}
+						transition={{ duration: 0.3 }}
 						className="mt-4 flex items-center justify-center gap-4 sm:gap-6 text-sm font-mono flex-wrap"
 					>
 						<div className="flex items-center gap-2">
-							<span className="text-black">confessions:</span>
+							<span className="text-gray-700">confessions:</span>
 							<span className="font-bold text-black">{stats.total}</span>
 						</div>
 						<svg
 							width="24"
 							height="6"
 							viewBox="0 0 24 6"
-							className="text-black"
+							className="text-gray-700"
 							style={{ minWidth: "24px" }}
 						>
 							<path
@@ -187,7 +187,7 @@ export function StorySection({
 							/>
 						</svg>
 						<div className="flex items-center gap-2">
-							<span className="text-black">deleted:</span>
+							<span className="text-gray-700">deleted:</span>
 							<span className="font-bold text-black">{stats.deleted}</span>
 						</div>
 					</motion.div>

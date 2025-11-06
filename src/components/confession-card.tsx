@@ -16,6 +16,7 @@ interface ConfessionCardProps {
 	showModeratorTools?: boolean;
 	isSelected?: boolean;
 	onToggleSelect?: () => void;
+	isHighlighted?: boolean;
 }
 
 export function ConfessionCard({
@@ -30,6 +31,7 @@ export function ConfessionCard({
 	showModeratorTools = false,
 	isSelected = false,
 	onToggleSelect,
+	isHighlighted = false,
 }: ConfessionCardProps) {
 	const rotations = [-2, 1, -1, 2, -1.5, 0.5, 1.5, -0.5];
 	const rotation = rotations[index % rotations.length];
@@ -66,7 +68,7 @@ export function ConfessionCard({
 			)}
 
 			<div
-				className="relative border-3 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] group-hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] transition-all duration-200"
+				className={`relative border-3 ${isHighlighted ? "border-yellow-400 border-4 shadow-[0_0_0_4px_rgba(250,204,21,0.3)]" : "border-black"} shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] group-hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] transition-all duration-200`}
 				style={{ backgroundColor: color }}
 			>
 				<div className="absolute -top-3 left-1/2 -translate-x-1/2 w-16 h-6 bg-white/60 border border-black/20 rotate-0 shadow-sm" />

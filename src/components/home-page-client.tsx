@@ -38,6 +38,7 @@ export function HomePageClient({ isModerator }: HomePageClientProps) {
 	const [isInitialLoad, setIsInitialLoad] = useState(true);
 	const [submissionsPaused, setSubmissionsPaused] = useState(false);
 	const [statsRefresh, setStatsRefresh] = useState(0);
+	const [highlightedId, setHighlightedId] = useState<number | null>(null);
 	const loadingRef = useRef(false);
 
 	const fetchConfessions = useCallback(
@@ -86,6 +87,7 @@ export function HomePageClient({ isModerator }: HomePageClientProps) {
 		const confessionId = params.get("confession");
 		if (confessionId) {
 			const id = parseInt(confessionId);
+			setHighlightedId(id);
 			setTimeout(() => {
 				const element = document.getElementById(`confession-${id}`);
 				if (element) {
@@ -96,6 +98,7 @@ export function HomePageClient({ isModerator }: HomePageClientProps) {
 					}
 				}
 			}, 500);
+			setTimeout(() => setHighlightedId(null), 3000);
 		}
 	}, []);
 
@@ -203,6 +206,7 @@ export function HomePageClient({ isModerator }: HomePageClientProps) {
 								onToggleSelect={
 									isModerator ? () => toggleSelect(confession.id) : undefined
 								}
+								isHighlighted={confession.id === highlightedId}
 							/>
 						))}
 					</div>

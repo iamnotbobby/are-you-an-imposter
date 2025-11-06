@@ -36,6 +36,13 @@ export function CreateConfessionModal({
 	const [showCopied, setShowCopied] = useState(false);
 	const maxChars = 500;
 
+	useEffect(() => {
+		if (isOpen) {
+			const randomIndex = Math.floor(Math.random() * AVAILABLE_COLORS.length);
+			setSelectedColor(AVAILABLE_COLORS[randomIndex]);
+		}
+	}, [isOpen]);
+
 	const handleCaptchaSolve = (token: string) => {
 		setCaptchaToken(token);
 		setIsCaptchaVerified(true);
@@ -82,7 +89,8 @@ export function CreateConfessionModal({
 			}
 
 			setText("");
-			setSelectedColor(AVAILABLE_COLORS[0]);
+			const randomIndex = Math.floor(Math.random() * AVAILABLE_COLORS.length);
+			setSelectedColor(AVAILABLE_COLORS[randomIndex]);
 			setCaptchaToken(null);
 			setIsCaptchaVerified(false);
 
