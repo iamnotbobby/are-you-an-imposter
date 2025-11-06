@@ -105,7 +105,7 @@ export function DeleteManagerModal({
 						>
 							<div className="p-6 space-y-6">
 								<div className="flex justify-between items-center">
-									<h2 className="text-2xl font-black uppercase">
+									<h2 className="text-2xl font-black">
 										manage deletions
 									</h2>
 									<button
