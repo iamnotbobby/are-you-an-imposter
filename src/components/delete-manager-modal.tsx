@@ -20,6 +20,7 @@ export function DeleteManagerModal({
 	const [savedConfessions, setSavedConfessions] = useState<
 		{ id: number; token: string }[]
 	>([]);
+	const [invalidTokens, setInvalidTokens] = useState<number[]>([]);
 
 	const loadSavedConfessions = () => {
 		const saved: { id: number; token: string }[] = [];
@@ -36,6 +37,14 @@ export function DeleteManagerModal({
 		setSavedConfessions(saved);
 	};
 
+	const handleCleanupInvalidTokens = () => {
+		invalidTokens.forEach((id) => {
+			localStorage.removeItem(`confession_${id}`);
+		});
+		setInvalidTokens([]);
+		loadSavedConfessions();
+	};
+
 	const handleDeleteConfession = async (id: number, token: string) => {
 		setIsDeleting(true);
 		setError("");
@@ -50,7 +59,15 @@ export function DeleteManagerModal({
 			if (response.ok) {
 				localStorage.removeItem(`confession_${id}`);
 				loadSavedConfessions();
+				setInvalidTokens((prev) =>
+					prev.filter((invalidId) => invalidId !== id),
+				);
 				onSuccess?.();
+			} else if (response.status === 404) {
+				setInvalidTokens((prev) => [...new Set([...prev, id])]);
+				setError(
+					"this confession no longer exists (possibly deleted by a moderator). click 'clean up invalid tokens' to remove it from your saved list.",
+				);
 			} else {
 				const data = await response.json();
 				setError(data.error || "invalid token");
@@ -83,6 +100,10 @@ export function DeleteManagerModal({
 						const savedToken = localStorage.getItem(key);
 						if (savedToken === token) {
 							localStorage.removeItem(key);
+							const id = parseInt(key.replace("confession_", ""));
+							setInvalidTokens((prev) =>
+								prev.filter((invalidId) => invalidId !== id),
+							);
 							break;
 						}
 					}
@@ -90,6 +111,10 @@ export function DeleteManagerModal({
 				loadSavedConfessions();
 				setDeleteTokenInput("");
 				onSuccess?.();
+			} else if (response.status === 404) {
+				setError(
+					"this confession no longer exists (possibly deleted by a moderator).",
+				);
 			} else {
 				const data = await response.json();
 				setError(data.error || "invalid token");
@@ -153,9 +178,20 @@ export function DeleteManagerModal({
 
 								{savedConfessions.length > 0 ? (
 									<div className="space-y-4">
-										<p className="text-sm font-bold text-gray-600">
-											your saved confessions:
-										</p>
+										<div className="flex justify-between items-center">
+											<p className="text-sm font-bold text-gray-600">
+												your saved confessions:
+											</p>
+											{invalidTokens.length > 0 && (
+												<button
+													onClick={handleCleanupInvalidTokens}
+													className="px-3 py-1 text-xs bg-orange-500 text-white font-bold border-2 border-black hover:bg-orange-600 transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all"
+												>
+													clean up {invalidTokens.length} invalid token
+													{invalidTokens.length !== 1 ? "s" : ""}
+												</button>
+											)}
+										</div>
 										{savedConfessions.map(({ id, token }) => (
 											<div
 												key={id}
