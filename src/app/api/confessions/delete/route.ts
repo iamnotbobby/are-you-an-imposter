@@ -14,7 +14,7 @@ export async function POST(request: Request) {
 				{ error: "Too many deletion attempts. Please try again later." },
 				{
 					status: 429,
-					headers: { "X-RateLimit-Remaining": "0" },
+					headers: { "X-RateLimit-Remaining": remaining.toString() },
 				},
 			);
 		}
